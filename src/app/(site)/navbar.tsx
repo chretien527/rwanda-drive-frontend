@@ -1,16 +1,36 @@
 'use client'
 
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { X, Menu, Shield, ArrowRight } from 'lucide-react'
+import { apiService } from '@/lib/api'
 
 interface NavbarProps {
   isLoggedIn?: boolean
   onLogout?: () => void
 }
 
-export default function Navbar({ isLoggedIn = false, onLogout }: NavbarProps) {
+export default function Navbar({ isLoggedIn: propIsLoggedIn, onLogout }: NavbarProps) {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
+  const [isLoggedIn, setIsLoggedIn] = useState(false)
+
+  useEffect(() => {
+    if (propIsLoggedIn !== undefined) {
+      setIsLoggedIn(propIsLoggedIn)
+    } else {
+      setIsLoggedIn(apiService.isAuthenticated())
+    }
+  }, [propIsLoggedIn])
+
+  const handleSignOut = async () => {
+    if (onLogout) {
+      onLogout()
+    } else {
+      await apiService.logout()
+      setIsLoggedIn(false)
+      window.location.href = '/'
+    }
+  }
 
   return (
     <header className='fixed top-4 inset-x-0 z-50 w-full px-4 sm:px-6 lg:px-8 max-w-6xl mx-auto pointer-events-none'>
@@ -66,7 +86,7 @@ export default function Navbar({ isLoggedIn = false, onLogout }: NavbarProps) {
             </>
           ) : (
             <button
-              onClick={onLogout}
+              onClick={handleSignOut}
               className='bg-white hover:bg-slate-100 text-[#0e1e38] text-xs font-bold px-4 py-2 rounded-xl transition-all'
             >
               Sign Out

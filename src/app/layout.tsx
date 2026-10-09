@@ -30,9 +30,8 @@ export default function RootLayout({
 }>) {
   return (
     <html lang='en' className={`${outfit.variable} ${geistSans.variable} ${geistMono.variable} h-full antialiased`}>
-      <body className='min-h-full flex flex-col bg-[#F4F4F5] text-[#0e1e38] font-sans'>
+      <body className='min-h-full flex flex-col bg-white text-[#0e1e38] font-sans'>
         {children}
-        <div className='h-screen w-full fixed top-0 left-0 -z-10 bg-[url("/grain.jpg")] opacity-5' />
       </body>
     </html>
   )

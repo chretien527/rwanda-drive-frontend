@@ -35,7 +35,7 @@ export default function FAQ() {
   ]
 
   return (
-    <section id='faq' className='py-24 border-t border-b border-[#E4E4E7] bg-[#F4F4F5]'>
+    <section id='faq' className='py-24 border-t border-b border-[#E4E4E7] bg-transparent'>
       <div className='mx-auto max-w-6xl px-4 sm:px-6'>
         <h2
           className='text-center text-sm font-medium text-muted-foreground mb-8'

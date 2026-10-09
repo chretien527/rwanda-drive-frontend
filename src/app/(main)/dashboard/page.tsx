@@ -43,11 +43,16 @@ function DashboardContent() {
         if (user.full_name) {
           setUserFullName(user.full_name);
         }
+        if (user.role) {
+          const role = user.role.toLowerCase() === 'officer' ? 'officer' : 'driver';
+          setCurrentRole(role);
+        }
       })
-      .catch(() => {
-        // Keep mock fallback when session is unavailable
+      .catch((err) => {
+        console.warn('Session verification failed in dashboard:', err);
+        router.replace('/login');
       });
-  }, []);
+  }, [router]);
 
   useEffect(() => {
     try {
@@ -90,8 +95,9 @@ function DashboardContent() {
     setPoliceActiveSection('scanner');
   };
 
-  const handleLogout = () => {
-    router.push('/');
+  const handleLogout = async () => {
+    await apiService.logout();
+    router.replace('/login');
   };
 
   // DRIVER SIDEBAR ITEMS
@@ -131,7 +137,7 @@ function DashboardContent() {
     <div className="min-h-screen flex bg-slate-50 font-sans text-[#0e1e38]">
       
       {/* ===== SIDEBAR ===== */}
-      <aside className={`fixed left-0 top-0 h-full bg-speckle-pattern bg-white text-[#0e1e38] flex flex-col z-50 transition-all duration-300 border-r border-slate-200/90 shadow-[10px_0_30px_-5px_rgba(14,30,56,0.18)] ${
+      <aside className={`fixed left-0 top-0 h-full bg-white text-[#0e1e38] flex flex-col z-50 transition-all duration-300 border-r border-slate-200/90 shadow-[10px_0_30px_-5px_rgba(14,30,56,0.18)] ${
         isSidebarCollapsed ? 'w-[72px]' : 'w-[250px]'
       }`}>
         {/* Right Edge Shadow Seam */}

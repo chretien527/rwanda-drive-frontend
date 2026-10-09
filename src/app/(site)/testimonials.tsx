@@ -56,7 +56,7 @@ export default function Testimonials() {
   ]
 
   return (
-    <section id='entrusted-users' className='py-24 bg-white border-t border-[#E4E4E7] text-[#0e1e38] overflow-hidden'>
+    <section id='entrusted-users' className='py-24 bg-white/80 backdrop-blur-xs border-t border-[#E4E4E7] text-[#0e1e38] overflow-hidden'>
       <div className='mx-auto max-w-6xl px-4 sm:px-6'>
         {/* Section Header */}
         <div className='text-center max-w-3xl mx-auto mb-16'>

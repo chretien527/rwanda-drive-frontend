@@ -76,18 +76,39 @@ export class ApiError extends Error {
 }
 
 class ApiService {
-  private getToken(): string | null {
+  getToken(): string | null {
+    if (typeof window === 'undefined') return null;
     return localStorage.getItem('access_token');
   }
 
-  private setTokens(accessToken: string, refreshToken: string) {
-    localStorage.setItem('access_token', accessToken);
-    localStorage.setItem('refresh_token', refreshToken);
+  getRefreshToken(): string | null {
+    if (typeof window === 'undefined') return null;
+    return localStorage.getItem('refresh_token');
   }
 
-  private clearTokens() {
-    localStorage.removeItem('access_token');
-    localStorage.removeItem('refresh_token');
+  isAuthenticated(): boolean {
+    if (typeof window === 'undefined') return false;
+    const token = localStorage.getItem('access_token');
+    return Boolean(token && token.trim() !== '');
+  }
+
+  setTokens(accessToken: string, refreshToken: string) {
+    if (typeof window !== 'undefined') {
+      localStorage.setItem('access_token', accessToken);
+      localStorage.setItem('refresh_token', refreshToken);
+      // Synchronize with cookie for Next.js middleware protection
+      document.cookie = `access_token=${accessToken}; path=/; max-age=604800; SameSite=Lax`;
+    }
+  }
+
+  clearTokens() {
+    if (typeof window !== 'undefined') {
+      localStorage.removeItem('access_token');
+      localStorage.removeItem('refresh_token');
+      localStorage.removeItem('user');
+      // Expire auth cookie
+      document.cookie = 'access_token=; path=/; max-age=0; SameSite=Lax';
+    }
   }
 
   /**
@@ -114,9 +135,17 @@ class ApiService {
       body: JSON.stringify({ email, password }),
     });
 
-    // Store tokens if available (backend uses snake_case keys)
-    if (data.tokens) {
-      this.setTokens(data.tokens.access_token, data.tokens.refresh_token);
+    // Store tokens if available (supports snake_case and camelCase)
+    const anyData = data as any;
+    const access = data.tokens?.access_token || anyData.tokens?.accessToken || anyData.access_token || anyData.accessToken;
+    const refresh = data.tokens?.refresh_token || anyData.tokens?.refreshToken || anyData.refresh_token || anyData.refreshToken || '';
+
+    if (access) {
+      this.setTokens(access, refresh);
+    }
+
+    if (data.user && typeof window !== 'undefined') {
+      localStorage.setItem('user', JSON.stringify(data.user));
     }
 
     return data;
@@ -223,13 +252,17 @@ class ApiService {
   async logout() {
     const token = this.getToken();
     if (token) {
-      await fetch(`${API_BASE_URL}/auth/logout`, {
-        method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json',
-        },
-      });
+      try {
+        await fetch(`${API_BASE_URL}/auth/logout`, {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json',
+          },
+        });
+      } catch (err) {
+        console.warn('Backend logout request failed, clearing local tokens:', err);
+      }
     }
     this.clearTokens();
   }

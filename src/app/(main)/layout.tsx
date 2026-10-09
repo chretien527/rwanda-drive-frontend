@@ -1,4 +1,5 @@
 import type { Metadata } from 'next'
+import { AuthGuard } from '@/components/AuthGuard'
 
 export const metadata: Metadata = {
   title: 'Dashboard | Rwanda Drive',
@@ -9,5 +10,5 @@ export default function MainLayout({
 }: {
   children: React.ReactNode
 }) {
-  return <>{children}</>
+  return <AuthGuard>{children}</AuthGuard>
 }

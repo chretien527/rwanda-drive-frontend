@@ -8,7 +8,7 @@ import Footer from './(site)/footer'
 
 export default function Page() {
   return (
-    <div className='min-h-screen w-full flex flex-col font-sans bg-[#F4F4F5] text-[#0e1e38] overflow-x-hidden'>
+    <div className='min-h-screen w-full flex flex-col font-sans bg-speckle-pattern text-[#0e1e38] overflow-x-hidden'>
       <Navbar />
       <main className='flex-1 w-full pt-20'>
         <Hero />
